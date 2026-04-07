@@ -20,7 +20,8 @@ nmap -sCV -Pn -O <IP>
 
 -Pn = no ping 
 
--O = Os detection 
+-O = Os detection
+
 Classic mode for a pentesting 
 
 <img width="880" height="661" alt="Capture d&#39;écran 2026-04-07 145026" src="https://github.com/user-attachments/assets/9c4806a2-221e-4fff-aa81-7ca99ec23846" />
