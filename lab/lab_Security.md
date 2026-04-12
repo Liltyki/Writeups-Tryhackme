@@ -1,9 +1,7 @@
 # How I Secured My Cybersecurity Lab
 
 ## Introduction
-
 As part of my cybersecurity journey, I decided to build a personal lab to practice both Red Team and Blue Team techniques. This lab runs on a VPS hosted  and uses Docker to simulate real-world attack and defense scenarios.
-
 But building a secure lab is very important . A poorly secured lab exposed to the internet is a real target, and through this process path to secure my own lab i learned a  lot , no longer theory its time to practice. 
 ---
 
@@ -17,17 +15,17 @@ The first thing I did after connecting for the first time was update the system 
 sudo apt update && sudo apt upgrade -y
 ```
 
-Never skip this step. Running outdated packages means running known vulnerabilities. With a updated Packahes the only danger for me now is Zero-Day vulnerability. 
+Never skip this step. Running outdated packages means running known vulnerabilities. With a updated Packages the only danger for me now is Zero-Day vulnerability. 
 
 ---
 
 ## Part 2 — SSH Hardening
 
-SSH is the main entry point to my server. Leaving it with default settings would be danger and easy to gain acces for a malicious attacker. I have in mind to change port , use a MFA (multi-factor authentification), create Key pair and change several options .
+SSH is the main entry point to my server. Leaving it with default settings would be dangerous and easy to gain access for a malicious attacker. I have in mind to change port , use a MFA (multi-factor authentication), create Key pair and change several options .
 
 ### My keys pair with ed25519  ?
 
-I generated my SSH key pair using the **ed25519** algorithm instead of the traditional RSA. I decided to use ed25519 because in theory this is more strong and we can considere RSA as a old cryptograpy. Still usable but ed25519 make me a better choice in this case! 
+I generated my SSH key pair using the **ed25519** algorithm instead of the traditional RSA. I decided to use ed25519 because in theory this is  stronger and we can consider RSA as a old cryptograpy. Still usable but ed25519 make me a better choice in this case! 
 
 ```bash
 ssh-keygen -t ed25519 -C "lab-ovh"
@@ -78,7 +76,7 @@ Changing the default port from 22 to 2222 does not add security by itself, but i
 
 ## Part 3 — Firewall with UFW
 
-UFW (Uncomplicated Firewall) is my first line of defense against unwanted connections.
+UFW is my first line of defense against unwanted connections, my firewall.
 
 ### Default Deny Policy
 
@@ -87,7 +85,7 @@ sudo ufw default deny incoming
 sudo ufw default allow outgoing
 ```
 
-This is the **whitelist approach** — everything is blocked by default, and I only open what I explicitly need. This is much safer than a blacklist approach where you try to block known threats.
+This is the whitelist approach everything is blocked by default, i only allow what i need. This is much safer than a blacklist approach where you try to block known threats.
 
 ### Allowed Ports
 
@@ -96,13 +94,13 @@ sudo ufw allow 2222/tcp   # SSH
 sudo ufw allow 51820/udp  # WireGuard VPN
 ```
 
-That is it. Only two ports are publicly accessible. Everything else — DVWA, Wireshark, target SSH — is only accessible through the WireGuard tunnel.
+That is it. Only two ports are publicly accessible. Everything else like DVWN, Wireshark, vm kali .... is only accessible through the WireGuard tunnel.
 
 ---
 
 ## Part 4 — Fail2ban : Automated Brute Force Protection
 
-Even with MFA on SSH, automated bots will still attempt to connect. Fail2ban monitors authentication logs and automatically bans IPs that fail too many times.
+Fail2ban monitors authentication logs and automatically bans IPs that fail too many times.
 
 My configuration in `/etc/fail2ban/jail.local` :
 
@@ -119,17 +117,17 @@ logpath = /var/log/auth.log
 ```
 
 **Why jail.local and not jail.conf ?**
-`jail.conf` is overwritten during Fail2ban updates. Always use `jail.local` for custom configuration — it is never touched by updates.
+`jail.conf` is overwritten during Fail2ban updates. Always use `jail.local` for custom configuration  it is never touched by updates.
 
 ---
 
 ## Part 5 — WireGuard VPN : My Personal Encrypted Tunnel
 
-WireGuard transforms my VPS into a personal VPN server. It creates an encrypted tunnel between my Kali machine and the VPS.
+WireGuard transforms my VPS into a personal VPN server. It creates an encrypted tunnel between my  machine and the VPS. It is very interesting because if i have to work on a non professional environment like my home or a public wifi is the minimum to encrypted what i'm doing ! 
 
 ### Why WireGuard ?
 
-WireGuard is a modern VPN protocol integrated directly into the Linux kernel since version 5.6. It uses **ChaCha20** for encryption and **Curve25519** for key exchange. With only ~4,000 lines of code versus 600,000 for OpenVPN, its attack surface is minimal.
+After few research i find Wireguard a modern VPN protocol integrated into the linux Kernel.  It uses **ChaCha20** for encryption and **Curve25519** for key exchange.
 
 ### How It Works
 
@@ -143,7 +141,7 @@ VPS OVH (10.8.0.1 / 135.125.191.20)
    Internet
 ```
 
-Once connected to the VPN, my real IP is hidden behind the VPS IP. My ISP only sees an encrypted connection to OVH — not what I am doing.
+Once connected to the VPN, my real IP is hidden behind the VPS IP. My ISP only sees an encrypted connection to OVH ,not what I am doing.
 
 ### The MFA Analogy
 
@@ -156,24 +154,25 @@ Just like SSH MFA, WireGuard uses asymmetric cryptography :
 
 ## Part 6 — Docker Lab Isolation
 
-My lab runs inside Docker containers on the VPS. Each container represents a machine in a simulated network.
+My lab runs inside Docker containers on the VPS. Each container represents a machine in a simulated network. Docker allows me to isolate each environment in its own container.If a vulnerable container like DVWA 
+is compromised, the attacker is contained inside that container and cannot directly access the host system.
+
+It also allows me to instantly reset a compromised environment with a single command —> docker-compose down && docker-compose up -d . something impossible with a real machine.
 
 ### Internal Network
-
-All containers communicate on an isolated internal network `192.168.100.0/24` :
-
+All containers communicate on an isolated internal network 192.XXX.XXX.0/24 :
 ```
-kali_attacker  → 192.168.100.10
-target_ssh     → 192.168.100.20
-dvwa_web       → 192.168.100.30
-wireshark      → 192.168.100.40
+kali_attacker  → 192.XXX.XXX.10
+target_ssh     → 192.XXX.XXX.20
+dvwa_web       → 192.XXX.XXX.30
+wireshark      → 192.XXX.XXX.40
 ```
 
-No traffic leaves this network to the internet — it is completely isolated.
+No traffic leaves this network to the internet  it is completely isolated.
 
 ### Binding Ports to WireGuard Only
 
-By default, Docker exposes ports on all interfaces — meaning anyone on the internet could reach my vulnerable containers. I fixed this by binding ports exclusively to the WireGuard interface :
+By default, Docker exposes ports on all interfaces, meaning anyone on the internet could reach my vulnerable containers. I fixed this by binding ports exclusively to the WireGuard interface :
 
 ```yaml
 ports:
@@ -215,12 +214,7 @@ Combined with a daily cron job that deletes captures older than 24 hours, this g
 
 ## What I Learned
 
-Security is not a single action — it is a stack of layers. Each layer alone can be bypassed, but combined they make the attacker's job significantly harder.
 
-The weakest link in my setup remains my Kali machine — if it is compromised, the attacker gets my private SSH key and WireGuard key. This is why endpoint security matters as much as server security.
+Security is not a single action it is a stack of layers. Each layer alone can be bypassed, but combined they make the attacker's job harder. This Lab allow me to use a few different technology , like Wireguard and Docker in more deep. Lot of documentation review , video ... But now i can apply what i learn here in a real situation ! 
 
-> *"A chain is only as strong as its weakest link."*
-
----
-
-*This lab was built as part of my cybersecurity studies. All techniques described are used in an isolated, controlled environment for educational purposes.*
+Lot of concept used here was learn during my Security+ Lesson with Andrew Ramdayal , and at that time i was like "everything is very interesting but how i will used it " Know is done . 
