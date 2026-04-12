@@ -1,8 +1,10 @@
 # How I Secured My Cybersecurity Lab
 
 ## Introduction
+
 As part of my cybersecurity journey, I decided to build a personal lab to practice both Red Team and Blue Team techniques. This lab runs on a VPS hosted  and uses Docker to simulate real-world attack and defense scenarios.
 But building a secure lab is very important . A poorly secured lab exposed to the internet is a real target, and through this process path to secure my own lab i learned a  lot , no longer theory its time to practice. 
+
 ---
 
 ## Part 1 — The Foundation : Choosing a VPS
