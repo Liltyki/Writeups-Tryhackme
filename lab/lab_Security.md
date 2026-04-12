@@ -32,7 +32,7 @@ I generated my SSH key pair using the **ed25519** algorithm instead of the tradi
 ```bash
 ssh-keygen -t ed25519 -C "lab-ovh"
 ```
-his command generates two files :
+This command generates two files :
 - id_ed25519   → the private key (never shared)
 - id_ed25519.pub → the public key (copied to the VPS)
 
@@ -46,7 +46,6 @@ When I connect, SSH verifies that my private key matches the public key on the s
 
 I also created a backup of my private key on an encrypted USB drive. If I lose my machine, I can still access my server.
 
-So now 
 ### MFA on SSH — Two Factors to Connect
 
 I configured SSH to require **both** a private key **and** a password to connect. This is Multi-Factor Authentication applied to SSH :
@@ -138,7 +137,7 @@ Kali VM (10.8.0.2)
       ↓
   [ChaCha20 encrypted tunnel]
       ↓
-VPS OVH (10.8.0.1 / 135.125.191.20)
+VPS OVH (10.8.0.1 / 135.XXX.XXX.XXX)
       ↓
    Internet
 ```
