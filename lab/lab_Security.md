@@ -218,4 +218,4 @@ Combined with a daily cron job that deletes captures older than 24 hours, this g
 
 Security is not a single action it is a stack of layers. Each layer alone can be bypassed, but combined they make the attacker's job harder. This Lab allow me to use a few different technology , like Wireguard and Docker in more deep. Lot of documentation review , video ... But now i can apply what i learn here in a real situation ! 
 
-Lot of concept used here was learn during my Security+ Lesson with Andrew Ramdayal , and at that time i was like "everything is very interesting but how i will used it " Know is done . 
+Lot of concept used here was learn during my Security+ Lesson with Andrew Ramdayal , and at that time i was like "everything is very interesting but how i will used it " now is done . 
